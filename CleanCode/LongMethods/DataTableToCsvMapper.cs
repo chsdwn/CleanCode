@@ -1,15 +1,14 @@
 using System;
-using System.Configuration;
 using System.Data;
 using System.IO;
 
-namespace FooFoo
+namespace CleanCode.LongMethods
 {
     public class DataTableToCsvMapper
     {
-        public System.IO.MemoryStream Map(DataTable dataTable)
+        public System.IO.MemoryStream CreateMemoryFile(DataTable dataTable)
         {
-            MemoryStream ReturnStream = new MemoryStream();
+            var ReturnStream = new MemoryStream();
 
             StreamWriter sw = new StreamWriter(ReturnStream);
             WriteColumnNames(dataTable, sw);
@@ -24,39 +23,25 @@ namespace FooFoo
         {
             foreach (DataRow dr in dt.Rows)
             {
-                WriteRow(dt, dr, sw);
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+
+                    if (!Convert.IsDBNull(dr[i]))
+                    {
+                        string str = String.Format("\"{0:c}\"", dr[i].ToString()).Replace("\r\n", " ");
+                        sw.Write(str);
+                    }
+                    else
+                    {
+                        sw.Write("");
+                    }
+
+                    if (i < dt.Columns.Count - 1)
+                    {
+                        sw.Write(",");
+                    }
+                }
                 sw.WriteLine();
-            }
-        }
-
-        private static void WriteRow(DataTable dt, DataRow dr, StreamWriter sw)
-        {
-            for (int i = 0; i < dt.Columns.Count; i++)
-            {
-                WriteCell(dr, i, sw);
-
-                WriteSeperatorIfRequired(dt, i, sw);
-            }
-        }
-
-        private static void WriteSeperatorIfRequired(DataTable dt, int i, StreamWriter sw)
-        {
-            if (i < dt.Columns.Count - 1)
-            {
-                sw.Write(",");
-            }
-        }
-
-        private static void WriteCell(DataRow dr, int i, StreamWriter sw)
-        {
-            if (!Convert.IsDBNull(dr[i]))
-            {
-                string str = String.Format("\"{0:c}\"", dr[i].ToString()).Replace("\r\n", " ");
-                sw.Write(str);
-            }
-            else
-            {
-                sw.Write("");
             }
         }
 
