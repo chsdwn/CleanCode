@@ -7,11 +7,6 @@ namespace CleanCode.FullRefactoring
     {
         private readonly PostDbContext _dbContext;
 
-        public PostRepository()
-        {
-            _dbContext = new PostDbContext();
-        }
-
         public Post GetPost(int postId)
         {
             return _dbContext.Posts.SingleOrDefault(p => p.Id == postId);
